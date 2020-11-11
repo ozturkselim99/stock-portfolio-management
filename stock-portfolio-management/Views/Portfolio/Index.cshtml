@@ -1,0 +1,160 @@
+﻿@model PortfolioModel
+<div id="portfolio">
+    <div class="card border-0 shadow my-5">
+        <div class="card-header">
+            <h5 class="mb-0 d-inline">My Portfolio</h5>
+            <h5 class="mb-0 d-inline float-right ">
+                Total Gain: @if (Model.TotalGain() > 0)
+                {
+                    <span style="color: #26A69A">@Model.TotalGain().ToString("c")</span>
+                }
+                else
+                {
+                    <span style="color: #EF5350">@Model.TotalGain().ToString("c")</span>
+                }
+            </h5>
+        </div>
+        <div class="card-body">
+            <table id="example" class="table  dt-responsive " style="width:100%">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Code</th>
+                        <th>Last Price</th>
+                        <th>Daily Change</th>
+                        <th>Cost</th>
+                        <th>Quantity</th>
+                        <th>Total Buy</th>
+                        <th>Gain</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.PortfolioItems)
+                    {
+                        <tr>
+                            <td>@item.code</td>
+                            <td>@item.lastPrice</td>
+                            @if (@Math.Round((item.lastPrice - item.lastPrice / ((item.dailyChange / 100) + 1)), 3) < 0)
+                            {
+                                <td style="color:#EF5350">
+                                    @Math.Round((item.lastPrice - item.lastPrice / ((item.dailyChange / 100) + 1)), 3) (@item.dailyChange%)
+                                </td>
+                            }
+                            else
+                            {
+                                <td style="color:#26A69A">
+                                    @Math.Round((item.lastPrice - item.lastPrice / ((item.dailyChange / 100) + 1)), 3) (@item.dailyChange%)
+                                </td>
+                            }
+                            <td>@item.cost</td>
+                            <td>@item.quantity</td>
+                            <td>@Math.Round(item.totalBuy, 2)</td>
+                            @if (@Math.Round((item.lastPrice * item.quantity) - item.totalBuy, 2) < 0)
+                            {
+                                <td style="color:#EF5350">
+                                    @Math.Round((item.lastPrice * item.quantity) - item.totalBuy, 2)
+                                </td>
+                            }
+                            else
+                            {
+                                <td style="color:#26A69A">
+                                    @Math.Round((item.lastPrice * item.quantity) - item.totalBuy, 2)
+                                </td>
+                            }
+                            <td>
+                                <form asp-action="EditStockDetails" asp-controller="Portfolio" method="post">
+                                    <input name="code" value="@item.code" type="hidden" />
+                                    <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#@item.code"><i class="fas fa-edit"></i></button>
+                                    <div class="modal fade" id="@item.code" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="exampleModalLabel">Edit Stock Details(@item.code)</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div class="input-group input-group-sm mb-3">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text" id="inputGroup-sizing-sm">Quantity</span>
+                                                                </div>
+                                                                <input type="number" class="form-control" name="quantity" aria-label="Small" aria-describedby="inputGroup-sizing-sm" value="@item.quantity">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="input-group input-group-sm mb-3">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text" id="inputGroup-sizing-sm">Cost</span>
+                                                                </div>
+                                                                <input type="number" step=0.01 class="form-control" name="cost" aria-label="Small" aria-describedby="inputGroup-sizing-sm" value="@item.cost">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </td>
+                            <td>
+                                <form asp-controller="Portfolio" asp-action="DeleteFromPortfolio" method="post">
+                                    <input type="hidden" name="code" value="@item.code" />
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-times "></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer ">
+            <h5 class="mb-0 d-inline float-right ">
+                Current Balance: <span class="text-secondary">@Model.CurrentBalance().ToString("c")</span>
+            </h5>
+        </div>
+    </div>
+</div>
+@section Scripts
+{
+    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.5/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.5/js/responsive.bootstrap4.min.js"></script>
+    <script>
+        function updatePortfolio() {
+            var portfolio = $("#portfolio");
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("Index","Portfolio")",
+                dataType: "html",
+                cache: false,
+                success: function (data) {
+                    var data = $.parseHTML(data);  //<----try with $.parseHTML().
+                    $(data).find('#portfolio').each(function () {
+                        $(portfolio).html($(this).html());
+                    });
+                    $('#example').DataTable({
+                        "destroy": true, //use for reinitialize datatable
+                    });
+                },
+            });
+        }
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#example').DataTable({});
+            setInterval(updatePortfolio, 120000);   
+        });
+    </script>
+
+}

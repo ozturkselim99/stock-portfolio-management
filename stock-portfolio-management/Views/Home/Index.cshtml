@@ -1,0 +1,127 @@
+﻿@model StockListViewModel
+<div id="BorsaIstanbul">
+    <div class="card border-0 shadow my-5">
+        <div class="card-header">
+            Borsa Istanbul
+        </div>
+        <div class="card-body">
+            <table id="example" class="table table-striped table-bordered dt-responsive " style="width:100%">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Company</th>
+                        <th>Last Price</th>
+                        <th>Change</th>
+                        <th>Change %</th>
+                        <th>Volume</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.stocks)
+                    {
+                        <tr>
+                            <td>@item.code </td>
+                            <td>@item.text</td>
+                            <td>@item.lastprice </td>
+                            @if (@Math.Round((item.lastprice - item.lastprice / ((item.rate / 100) + 1)), 3) < 0)
+                            {
+                                <td style="color:#EF5350">@Math.Round((item.lastprice - item.lastprice / ((item.rate / 100) + 1)), 3)</td>
+                            }
+                            else
+                            {
+                                <td style="color:#26A69A">@Math.Round((item.lastprice - item.lastprice / ((item.rate / 100) + 1)), 3)</td>
+                            }
+                            @if (item.rate < 0)
+                            {
+                                <td style="color:#EF5350">@item.rate%</td>
+                            }
+                            else
+                            {
+                                <td style="color:#26A69A">@item.rate%</td>
+                            }
+                            <td>@item.hacim</td>
+                            <td>
+                                <form asp-action="AddToPortfolio" asp-controller="Portfolio" method="post">
+                                    <input name="code" value="@item.code" type="hidden" />
+                                    <button type="button" class="btn btn-secondary btn-sm" data-toggle="modal" data-target="#@item.code"><small><i class="fas fa-plus-circle mr-1"></i>Add to Portfolio</small></button>
+                                    <div class="modal fade" id="@item.code" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="exampleModalLabel">Stock Details(@item.code)</h5>
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">&times;</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div class="input-group input-group-sm mb-3">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text" id="inputGroup-sizing-sm">Quantity</span>
+                                                                </div>
+                                                                <input type="number" class="form-control" name="quantity" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div class="input-group input-group-sm mb-3">
+                                                                <div class="input-group-prepend">
+                                                                    <span class="input-group-text" id="inputGroup-sizing-sm">Cost</span>
+                                                                </div>
+                                                                <input type="number" step=0.01 class="form-control" name="cost" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                    <button type="submit" class="btn btn-primary">Add to Portfolio</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer text-muted">
+        </div>
+    </div>
+</div>
+@section Scripts
+{
+    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.5/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.5/js/responsive.bootstrap4.min.js"></script>
+    <script>
+        function updateBorsaIstanbulData() {
+            var portfolio = $("#BorsaIstanbul");
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("Index","Home")",
+                dataType: "html",
+                cache: false,
+                success: function (data) {
+                    var data = $.parseHTML(data);  //<----try with $.parseHTML().
+                    $(data).find('#BorsaIstanbul').each(function () {
+                        $(BorsaIstanbul).html($(this).html());
+                    });
+                    $('#example').DataTable({
+                        "destroy": true, //use for reinitialize datatable
+                    });
+                },
+            });
+        }
+    </script>
+    <script>
+        $(document).ready(function () {
+            $('#example').DataTable({});
+            setInterval(updateBorsaIstanbulData, 150000);
+        });
+    </script>
+}

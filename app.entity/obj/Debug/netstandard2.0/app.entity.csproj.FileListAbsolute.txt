@@ -1,0 +1,9 @@
+C:\Users\oztur\source\repos\stock-portfolio-management\app.entity\bin\Debug\netstandard2.0\app.entity.deps.json
+C:\Users\oztur\source\repos\stock-portfolio-management\app.entity\bin\Debug\netstandard2.0\app.entity.dll
+C:\Users\oztur\source\repos\stock-portfolio-management\app.entity\bin\Debug\netstandard2.0\app.entity.pdb
+C:\Users\oztur\source\repos\stock-portfolio-management\app.entity\obj\Debug\netstandard2.0\app.entity.AssemblyInfoInputs.cache
+C:\Users\oztur\source\repos\stock-portfolio-management\app.entity\obj\Debug\netstandard2.0\app.entity.AssemblyInfo.cs
+C:\Users\oztur\source\repos\stock-portfolio-management\app.entity\obj\Debug\netstandard2.0\app.entity.csproj.CoreCompileInputs.cache
+C:\Users\oztur\source\repos\stock-portfolio-management\app.entity\obj\Debug\netstandard2.0\app.entity.dll
+C:\Users\oztur\source\repos\stock-portfolio-management\app.entity\obj\Debug\netstandard2.0\app.entity.pdb
+C:\Users\oztur\source\repos\stock-portfolio-management\app.entity\obj\Debug\netstandard2.0\app.entity.csprojAssemblyReference.cache
